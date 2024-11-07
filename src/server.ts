@@ -1,5 +1,5 @@
-import { Server } from "http";
-import app from "./app";
+import { Server } from 'http';
+import app from './app';
 
 const port = 3000;
 

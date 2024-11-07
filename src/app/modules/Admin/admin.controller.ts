@@ -6,24 +6,82 @@ import httpStatus from 'http-status';
 import pick from '../../../shared/pick';
 import { adminFilterableFields } from './admin.constant';
 
-const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+// GET ALL ADMINS
+const getAllAdmins = catchAsync(async (req: Request, res: Response) => {
   const query = req.query;
   const filters = pick(query, adminFilterableFields);
   const options = pick(query, ['limit', 'page', 'sortBy', 'sortOrder']);
   //   console.log('options from controller', options);
 
-  const result = await AdminService.getAllFromDB(filters, options);
+  const result = await AdminService.getAllAdminsFromDB(filters, options);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Admins fetched successfully!',
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
+// GET SINGLE ADMIN
+const getSingleAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await AdminService.getSingleAdminFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin data fetched by id!',
+    data: result,
+  });
+});
+
+// UPDATE ADMIN
+const updateAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await AdminService.updateAdminIntoDB(id, req.body);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin data updated!',
+    data: result,
+  });
+});
+
+// DELETE ADMIN
+const deleteAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await AdminService.deleteAdminFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin data deleted!',
+    data: result,
+  });
+});
+
+// SOFT DELETE ADMIN
+const softDeleteAdmin = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const result = await AdminService.softDeleteFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin data deleted!',
     data: result,
   });
 });
 
 export const AdminController = {
-  getAllFromDB,
+  getAllAdmins,
+  getSingleAdmin,
+  updateAdmin,
+  deleteAdmin,
+  softDeleteAdmin,
 };
 
 /*

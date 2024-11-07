@@ -1,0 +1,18 @@
+// NOTE: 
+
+
+
+
+
+
+
+// INFO: eslint is not working
+=> eslint and prettier settings
+1. npm install eslint prettier eslint-config-prettier eslint-plugin-prettier --save-dev
+2. npx eslint --init
+3. add script
+"scripts": {
+  "lint": "eslint .",
+  "format": "prettier --write ."
+}
+4. add rules

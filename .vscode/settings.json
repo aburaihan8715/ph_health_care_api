@@ -26,9 +26,18 @@
       "backgroundColor": "#3772ff",
       "isWholeLine": false,
     },
+    {
+      "text": "INFO:",
+      "color": "#fff",
+      "backgroundColor": "#377255",
+      "isWholeLine": false,
+    },
   ],
   "workbench.colorCustomizations": {
     "statusBar.background": "#b40326",
     "statusBar.foreground": "#edeaf0",
-  }
+  },
+  "cSpell.words": [
+    "tseslint"
+  ]
 }
