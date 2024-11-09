@@ -1,4 +1,4 @@
-import { Admin, PrismaClient, UserRole } from '@prisma/client';
+import { Admin, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import prisma from '../../../shared/prisma';

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Prisma } from '@prisma/client';
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
@@ -6,10 +7,10 @@ const globalErrorHandler = (
   err: any,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction,
 ) => {
-  let statusCode = httpStatus.INTERNAL_SERVER_ERROR;
-  let success = false;
+  const statusCode = httpStatus.INTERNAL_SERVER_ERROR;
+  const success = false;
   let message = err.message || 'Something went wrong!';
   let error = err;
 

@@ -6,7 +6,7 @@
 
 
 
-// INFO: eslint is not working
+// INFO: 
 => eslint and prettier settings
 1. npm install eslint prettier eslint-config-prettier eslint-plugin-prettier --save-dev
 2. npx eslint --init
