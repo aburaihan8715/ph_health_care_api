@@ -6,6 +6,7 @@ dotenv.config({ path: path.join(process.cwd(), '.env') });
 export default {
   NODE_ENV: process.env.NODE_ENV,
   port: process.env.PORT,
+
   JWT: {
     jwt_access_secret: process.env.JWT_ACCESS_SECRET,
     jwt_access_expires_in: process.env.JWT_ACCESS_EXPIRES_IN,
@@ -16,6 +17,12 @@ export default {
       process.env.JWT_PASSWORD_RESET_EXPIRES_IN,
   },
 
-  EMAIL_SENDER: {},
+  EMAIL_SENDER: {
+    email_user: process.env.EMAIL_USER,
+    email_pass: process.env.EMAIL_PASS,
+  },
+
   SSL: {},
+
+  reset_pass_ui_link: process.env.RESET_PASS_UI_LINK_LOCAL,
 };

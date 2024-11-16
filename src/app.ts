@@ -1,4 +1,9 @@
-import express, { Application, Request, Response } from 'express';
+import express, {
+  Application,
+  NextFunction,
+  Request,
+  Response,
+} from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
@@ -19,6 +24,18 @@ app.use(cors());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// TEST MIDDLEWARE
+app.use(
+  (
+    req: Request & { requestTime?: string },
+    res: Response,
+    next: NextFunction,
+  ) => {
+    req.requestTime = new Date().toISOString();
+    next();
+  },
+);
 
 // TEST ROUTE
 app.get('/', (req: Request, res: Response) => {
