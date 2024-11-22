@@ -22,7 +22,7 @@ router.get(
 router.patch(
   '/:id',
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  validateRequest(AdminValidation.updateSchema),
+  validateRequest(AdminValidation.adminUpdateValidationSchema),
   AdminController.updateAdmin,
 );
 

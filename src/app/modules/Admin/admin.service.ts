@@ -1,24 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Admin, Prisma, UserStatus } from '@prisma/client';
 import { adminSearchAbleFields } from './admin.constant';
-import { TAdminFilterRequest } from './admin.interface';
-import { TPaginationOptions } from '../../interface/pagination';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import prisma from '../../../shared/prisma';
+import { IPagination } from '../../interface/pagination';
 
 // GET ALL ADMINS
 const getAllAdminsFromDB = async (
-  queryFilters: TAdminFilterRequest,
-  options: TPaginationOptions
+  queryFilters: Record<string, unknown>,
+  options: IPagination,
 ) => {
   const { searchTerm, ...filterData } = queryFilters;
+
   const { limit, page, skip } =
     paginationHelper.calculatePagination(options);
-  const andConditions: Prisma.AdminWhereInput[] = [];
-  //   console.log(filterData);
+
+  const conditions: Prisma.AdminWhereInput[] = [];
 
   // 01 manage search
   if (searchTerm) {
-    andConditions.push({
+    conditions.push({
       OR: adminSearchAbleFields.map((field) => ({
         [field]: {
           contains: searchTerm,
@@ -30,7 +31,7 @@ const getAllAdminsFromDB = async (
 
   // 02 manage filter
   if (Object.keys(filterData).length > 0) {
-    andConditions.push({
+    conditions.push({
       AND: Object.keys(filterData).map((key) => ({
         [key]: {
           equals: (filterData as any)[key],
@@ -40,12 +41,12 @@ const getAllAdminsFromDB = async (
   }
 
   // 03 skip the deleted documents
-  andConditions.push({ isDeleted: false });
+  conditions.push({ isDeleted: false });
 
   // 04 get documents based on conditions
-  const whereConditions = { AND: andConditions };
+  // const whereConditions = { AND: conditions };
   const result = await prisma.admin.findMany({
-    where: whereConditions,
+    where: { AND: conditions },
     skip,
     take: limit,
     orderBy:
@@ -56,7 +57,7 @@ const getAllAdminsFromDB = async (
 
   // 05 get document count
   const total = await prisma.admin.count({
-    where: whereConditions,
+    where: { AND: conditions },
   });
 
   // 06 finally return the result
@@ -82,7 +83,7 @@ const getSingleAdminFromDB = async (id: string): Promise<Admin | null> => {
 // UPDATE ADMIN
 const updateAdminIntoDB = async (
   id: string,
-  data: Partial<Admin>
+  data: Partial<Admin>,
 ): Promise<Admin> => {
   await prisma.admin.findUniqueOrThrow({
     where: { id, isDeleted: false },

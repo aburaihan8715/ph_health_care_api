@@ -11,7 +11,6 @@ const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
   const query = req.query;
   const filters = pick(query, adminFilterableFields);
   const options = pick(query, ['limit', 'page', 'sortBy', 'sortOrder']);
-  //   console.log('options from controller', options);
 
   const result = await AdminService.getAllAdminsFromDB(filters, options);
 
