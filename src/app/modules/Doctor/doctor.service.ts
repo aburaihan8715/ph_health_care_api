@@ -26,6 +26,7 @@ const getAllDoctorsFromDB = async (
   }
 
   // manage specialities
+  // doctor > doctorSpecialties > specialties -> title
   if (specialities && specialities.length > 0) {
     conditions.push({
       doctorSpecialities: {

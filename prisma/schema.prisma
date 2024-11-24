@@ -108,6 +108,7 @@ model Doctor {
 
   user               User                 @relation(fields: [email], references: [email])
   doctorSpecialities DoctorSpecialities[]
+  doctorSchedules    DoctorSchedules[]
 
   @@map("doctors")
 }
@@ -123,7 +124,9 @@ model Patient {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user User @relation(references: [email], fields: [email])
+  user              User               @relation(references: [email], fields: [email])
+  patientHealthData PatientHealthData?
+  medicalReport     MedicalReport[]
 
   @@map("patients")
 }
@@ -145,4 +148,65 @@ model DoctorSpecialities {
 
   @@id([specialitiesId, doctorId])
   @@map("doctor_specialities")
+}
+
+model PatientHealthData {
+  id                  String        @id @default(uuid())
+  patientId           String        @unique
+  patient             Patient       @relation(fields: [patientId], references: [id])
+  gender              Gender
+  dateOfBirth         String
+  bloodGroup          BloodGroup
+  hasAllergies        Boolean?      @default(false)
+  hasDiabetes         Boolean?      @default(false)
+  height              String
+  weight              String
+  smokingStatus       Boolean?      @default(false)
+  dietaryPreferences  String?
+  pregnancyStatus     Boolean?      @default(false)
+  mentalHealthHistory String?
+  immunizationStatus  String?
+  hasPastSurgeries    Boolean?      @default(false)
+  recentAnxiety       Boolean?      @default(false)
+  recentDepression    Boolean?      @default(false)
+  maritalStatus       MaritalStatus @default(UNMARRIED)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@map("patient_health_data")
+}
+
+model MedicalReport {
+  id         String   @id @default(uuid())
+  patientId  String
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  reportName String
+  reportLink String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("medical_reports")
+}
+
+model Schedule {
+  id              String            @id @default(uuid())
+  startDateTime   DateTime
+  endDateTime     DateTime
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  doctorSchedules DoctorSchedules[]
+
+  @@map("schedules")
+}
+
+model DoctorSchedules {
+  doctorId      String
+  doctor        Doctor   @relation(fields: [doctorId], references: [id])
+  scheduleId    String
+  schedule      Schedule @relation(fields: [scheduleId], references: [id])
+  isBooked      Boolean  @default(false)
+  appointmentId String?  @unique
+
+  @@id([doctorId, scheduleId])
+  @@map("doctor_schedules")
 }
