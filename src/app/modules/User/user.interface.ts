@@ -15,11 +15,9 @@ export interface IPatientPayload {
   patient: Partial<Patient>;
 }
 
-export interface IUserSearchTerm {
-  searchTerm?: string;
-}
-export interface IUserFilter {
+export interface IUserQueryObj {
   email?: string;
   role?: string;
   status?: string;
+  searchTerm?: string;
 }

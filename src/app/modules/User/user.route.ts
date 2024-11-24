@@ -39,11 +39,37 @@ router.post(
   UserController.createPatient,
 );
 
+// GET MY PROFILE
+router.get(
+  '/me',
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.DOCTOR,
+    UserRole.PATIENT,
+  ),
+  UserController.getMyProfile,
+);
+
 // GET ALL USERS
 router.get(
   '/',
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   UserController.getAllUsers,
+);
+
+// UPDATE MY PROFILE
+router.patch(
+  '/update-my-profile',
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.DOCTOR,
+    UserRole.PATIENT,
+  ),
+  fileUploader.upload.single('file'),
+  parseBodyString(),
+  UserController.updateMyProfile,
 );
 
 // CHANGE PROFILE STATUS

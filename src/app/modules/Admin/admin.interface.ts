@@ -1,6 +1,6 @@
-export type TAdminFilterRequest = {
-  name?: string | undefined;
-  email?: string | undefined;
-  contactNumber?: string | undefined;
-  searchTerm?: string | undefined;
-};
+export interface IAdminQueryOgj {
+  name?: string;
+  email?: string;
+  contactNumber?: string;
+  searchTerm?: string;
+}

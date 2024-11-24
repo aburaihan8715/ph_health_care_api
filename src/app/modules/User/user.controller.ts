@@ -1,10 +1,11 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler, Response } from 'express';
 import { UserService } from './user.service';
 import catchAsync from '../../../shared/catchAsync';
 import httpStatus from 'http-status';
 import sendResponse from '../../../shared/sendResponse';
 import pick from '../../../shared/pick';
-// import { userFilterableFields } from './user.constant';
+import { IAuthUser } from '../../interface/common';
+import { IFile } from '../../interface/file';
 
 // CREATE ADMIN
 const createAdmin: RequestHandler = catchAsync(async (req, res) => {
@@ -43,27 +44,9 @@ const createPatient: RequestHandler = catchAsync(async (req, res) => {
 });
 
 // GET ALL USERS
-
-// const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
-//   const query = req.query;
-//   const filters = pick(query, userFilterableFields);
-//   const options = pick(query, ['limit', 'page', 'sortBy', 'sortOrder']);
-
-//   const result = await UserService.getAllUsersFromDB(filters, options);
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: 'Users fetched successfully!',
-//     meta: result.meta,
-//     data: result.data,
-//   });
-// });
-
 const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
   const query = req.query;
-  const searchTermObj = pick(query, ['searchTerm']);
-  const filterObj = pick(query, ['email', 'role', 'status']);
+  const queryObj = pick(query, ['email', 'role', 'status', 'searchTerm']);
   const paginationObj = pick(query, [
     'limit',
     'page',
@@ -72,8 +55,7 @@ const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
   ]);
 
   const result = await UserService.getAllUsersFromDB(
-    searchTermObj,
-    filterObj,
+    queryObj,
     paginationObj,
   );
 
@@ -104,10 +86,46 @@ const changeProfileStatus: RequestHandler = catchAsync(
   },
 );
 
+// GET MY PROFILE
+const getMyProfile = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const email = req.user?.email as string;
+    const result = await UserService.getMyProfileFromDB(email);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'My profile data fetched!',
+      data: result,
+    });
+  },
+);
+
+// UPDATE MY PROFILE
+const updateMyProfile = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    const email = req.user?.email as string;
+
+    const result = await UserService.updateMyProfileIntoDB(
+      email,
+      req.file as IFile,
+      req.body,
+    );
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'My profile updated!',
+      data: result,
+    });
+  },
+);
 export const UserController = {
   createAdmin,
   createDoctor,
   createPatient,
   getAllUsers,
   changeProfileStatus,
+  getMyProfile,
+  updateMyProfile,
 };
