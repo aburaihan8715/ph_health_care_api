@@ -1,6 +1,6 @@
 import { BloodGroup, Gender, MaritalStatus } from '@prisma/client';
 
-export interface IPatientQueryObj {
+export interface IPatientFilterOptions {
   searchTerm?: string | undefined;
   email?: string | undefined;
   contactNo?: string | undefined;

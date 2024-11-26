@@ -1,3 +1,8 @@
-export const userSearchAbleFields: string[] = ['email'];
+export const USER_SEARCHABLE_FIELDS: string[] = ['email'];
 
-export const userQueryableFields: string[] = ['email', 'role', 'status'];
+export const USER_FILTER_OPTIONS: string[] = [
+  'email',
+  'role',
+  'status',
+  'searchTerm',
+];

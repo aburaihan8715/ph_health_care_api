@@ -1,10 +1,10 @@
-export const patientSearchableFields: string[] = [
+export const PATIENT_SEARCHABLE_FIELDS: string[] = [
   'name',
   'email',
   'contactNo',
 ];
 
-export const patientQueryableFields: string[] = [
+export const PATIENT_FILTER_OPTIONS: string[] = [
   'searchTerm',
   'email',
   'contactNo',

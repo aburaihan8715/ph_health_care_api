@@ -8,13 +8,13 @@ import pick from '../../../shared/pick';
 // GET ALL ADMINS
 const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
   const query = req.query;
-  const queryObj = pick(query, [
+  const filterOptions = pick(query, [
     'name',
     'email',
     'contactNumber',
     'searchTerm',
   ]);
-  const paginationObj = pick(query, [
+  const paginationOptions = pick(query, [
     'limit',
     'page',
     'sortBy',
@@ -22,8 +22,8 @@ const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
   ]);
 
   const result = await AdminService.getAllAdminsFromDB(
-    queryObj,
-    paginationObj,
+    filterOptions,
+    paginationOptions,
   );
 
   sendResponse(res, {

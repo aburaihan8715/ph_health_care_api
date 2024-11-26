@@ -4,8 +4,8 @@ import catchAsync from '../../../shared/catchAsync';
 import httpStatus from 'http-status';
 import sendResponse from '../../../shared/sendResponse';
 import pick from '../../../shared/pick';
-import { IAuthUser } from '../../interface/common';
-import { IFile } from '../../interface/file';
+import { IAuthUser } from '../../interface/auth.interface';
+import { IFile } from '../../interface/file.interface';
 
 // CREATE ADMIN
 const createAdmin: RequestHandler = catchAsync(async (req, res) => {
@@ -46,8 +46,13 @@ const createPatient: RequestHandler = catchAsync(async (req, res) => {
 // GET ALL USERS
 const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
   const query = req.query;
-  const queryObj = pick(query, ['email', 'role', 'status', 'searchTerm']);
-  const paginationObj = pick(query, [
+  const filterOptions = pick(query, [
+    'email',
+    'role',
+    'status',
+    'searchTerm',
+  ]);
+  const paginationOptions = pick(query, [
     'limit',
     'page',
     'sortBy',
@@ -55,8 +60,8 @@ const getAllUsers: RequestHandler = catchAsync(async (req, res) => {
   ]);
 
   const result = await UserService.getAllUsersFromDB(
-    queryObj,
-    paginationObj,
+    filterOptions,
+    paginationOptions,
   );
 
   sendResponse(res, {

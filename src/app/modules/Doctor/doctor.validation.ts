@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const DoctorUpdateValidationSchema = z.object({
+const doctorUpdateValidationSchema = z.object({
   body: z.object({
     name: z.string().optional(),
     contactNumber: z.string().optional(),
@@ -8,5 +8,5 @@ const DoctorUpdateValidationSchema = z.object({
 });
 
 export const DoctorValidation = {
-  DoctorUpdateValidationSchema,
+  doctorUpdateValidationSchema,
 };

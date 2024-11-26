@@ -1,22 +1,27 @@
 import { Patient, Prisma, UserStatus } from '@prisma/client';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import prisma from '../../../shared/prisma';
-import { IPagination } from '../../interface/pagination';
-import { IPatientQueryObj, IPatientUpdate } from './patient.interface';
-import { patientSearchableFields } from './patient.constant';
+import {
+  IPatientFilterOptions,
+  IPatientUpdate,
+} from './patient.interface';
+import { IPaginationOptions } from '../../interface/pagination.interface';
+import { PATIENT_SEARCHABLE_FIELDS } from './patient.constant';
 
 // GET ALL PATIENTS
 const getAllPatientsFromDB = async (
-  queryObj: IPatientQueryObj,
-  paginationObj: IPagination,
+  filterOptions: IPatientFilterOptions,
+  paginationOptions: IPaginationOptions,
 ) => {
-  const { searchTerm, ...filter } = queryObj;
+  const { searchTerm, ...filter } = filterOptions;
+  const { limit, page, skip } =
+    paginationHelper.calculatePagination(paginationOptions);
   const conditions: Prisma.PatientWhereInput[] = [];
 
   // manage search
   if (searchTerm) {
     conditions.push({
-      OR: patientSearchableFields.map((field) => ({
+      OR: PATIENT_SEARCHABLE_FIELDS.map((field) => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -40,16 +45,19 @@ const getAllPatientsFromDB = async (
   });
 
   // manage pagination
-  const { limit, page, skip } =
-    paginationHelper.calculatePagination(paginationObj);
+  const whereConditions: Prisma.PatientWhereInput =
+    conditions.length > 0 ? { AND: conditions } : {};
 
   const result = await prisma.patient.findMany({
-    where: { AND: conditions },
+    where: whereConditions,
     skip,
     take: limit,
     orderBy:
-      paginationObj.sortBy && paginationObj.sortOrder
-        ? { [paginationObj.sortBy as string]: paginationObj.sortOrder }
+      paginationOptions.sortBy && paginationOptions.sortOrder
+        ? {
+            [paginationOptions.sortBy as string]:
+              paginationOptions.sortOrder,
+          }
         : { createdAt: 'desc' },
     include: {
       medicalReport: true,
@@ -59,7 +67,7 @@ const getAllPatientsFromDB = async (
 
   // get document count
   const total = await prisma.patient.count({
-    where: { AND: conditions },
+    where: whereConditions,
   });
 
   // finally return the result

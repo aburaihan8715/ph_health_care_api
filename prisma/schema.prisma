@@ -189,12 +189,12 @@ model MedicalReport {
 }
 
 model Schedule {
-  id              String            @id @default(uuid())
-  startDateTime   DateTime
-  endDateTime     DateTime
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  doctorSchedules DoctorSchedules[]
+  id               String            @id @default(uuid())
+  startDateAndTime DateTime
+  endDateAndTime   DateTime
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  doctorSchedules  DoctorSchedules[]
 
   @@map("schedules")
 }

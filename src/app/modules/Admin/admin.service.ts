@@ -1,22 +1,25 @@
 import { Admin, Prisma, UserStatus } from '@prisma/client';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import prisma from '../../../shared/prisma';
-import { IPagination } from '../../interface/pagination';
-import { IAdminQueryOgj } from './admin.interface';
-import { adminSearchAbleFields } from './admin.constant';
+import { IPaginationOptions } from '../../interface/pagination.interface';
+import { IAdminFilterOptions } from './admin.interface';
+import { ADMIN_SEARCHABLE_FIELDS } from './admin.constant';
 
 // GET ALL ADMINS
 const getAllAdminsFromDB = async (
-  queryObj: IAdminQueryOgj,
-  paginationObj: IPagination,
+  filterOptions: IAdminFilterOptions,
+  paginationOptions: IPaginationOptions,
 ) => {
-  const { searchTerm, ...filter } = queryObj;
+  const { searchTerm, ...filter } = filterOptions;
+  const { limit, page, skip } =
+    paginationHelper.calculatePagination(paginationOptions);
+
   const conditions: Prisma.AdminWhereInput[] = [];
 
   // manage search
   if (searchTerm) {
     conditions.push({
-      OR: adminSearchAbleFields.map((field) => ({
+      OR: ADMIN_SEARCHABLE_FIELDS.map((field) => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -40,22 +43,25 @@ const getAllAdminsFromDB = async (
   });
 
   // manage pagination
-  const { limit, page, skip } =
-    paginationHelper.calculatePagination(paginationObj);
+  const whereConditions: Prisma.AdminWhereInput =
+    conditions.length > 0 ? { AND: conditions } : {};
 
   const result = await prisma.admin.findMany({
-    where: { AND: conditions },
+    where: whereConditions,
     skip,
     take: limit,
     orderBy:
-      paginationObj.sortBy && paginationObj.sortOrder
-        ? { [paginationObj.sortBy as string]: paginationObj.sortOrder }
+      paginationOptions.sortBy && paginationOptions.sortOrder
+        ? {
+            [paginationOptions.sortBy as string]:
+              paginationOptions.sortOrder,
+          }
         : { createdAt: 'desc' },
   });
 
   // get document count
   const total = await prisma.admin.count({
-    where: { AND: conditions },
+    where: whereConditions,
   });
 
   // finally return the result

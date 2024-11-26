@@ -8,8 +8,8 @@ import { PatientService } from './patient.service';
 // GET ALL PATIENTS
 const getAllPatients: RequestHandler = catchAsync(async (req, res) => {
   const query = req.query;
-  const queryObj = pick(query, ['searchTerm', 'email', 'contactNo']);
-  const paginationObj = pick(query, [
+  const filterOptions = pick(query, ['searchTerm', 'email', 'contactNo']);
+  const paginationOptions = pick(query, [
     'limit',
     'page',
     'sortBy',
@@ -17,8 +17,8 @@ const getAllPatients: RequestHandler = catchAsync(async (req, res) => {
   ]);
 
   const result = await PatientService.getAllPatientsFromDB(
-    queryObj,
-    paginationObj,
+    filterOptions,
+    paginationOptions,
   );
 
   sendResponse(res, {

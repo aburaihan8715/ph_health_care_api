@@ -1,4 +1,4 @@
-export interface IAdminQueryOgj {
+export interface IAdminFilterOptions {
   name?: string;
   email?: string;
   contactNumber?: string;

@@ -22,7 +22,7 @@ router.get(
 router.patch(
   '/:id',
   auth(UserRole.SUPER_ADMIN, UserRole.DOCTOR),
-  validateRequest(DoctorValidation.DoctorUpdateValidationSchema),
+  validateRequest(DoctorValidation.doctorUpdateValidationSchema),
   DoctorController.updateDoctor,
 );
 

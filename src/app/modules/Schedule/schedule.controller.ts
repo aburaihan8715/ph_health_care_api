@@ -3,7 +3,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { ScheduleService } from './schedule.service';
 import httpStatus from 'http-status';
-import { IAuthUser } from '../../interface/common';
+import { IAuthUser } from '../../interface/auth.interface';
 import pick from '../../../shared/pick';
 
 const createSchedule = catchAsync(async (req, res) => {
@@ -12,7 +12,7 @@ const createSchedule = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Schedule created successfully!',
+    message: 'Schedules created successfully!',
     data: result,
   });
 });
@@ -20,9 +20,9 @@ const createSchedule = catchAsync(async (req, res) => {
 const getAllSchedules = catchAsync(
   async (req: Request & { user?: IAuthUser }, res: Response) => {
     const query = req.query;
-    const email = req.user?.email;
-    const queryObj = pick(query, ['startDate', 'endDate']);
-    const paginationObj = pick(query, [
+    const email = req.user?.email as string;
+    const filterOptions = pick(query, ['startDate', 'endDate']);
+    const paginationOptions = pick(query, [
       'limit',
       'page',
       'sortBy',
@@ -30,8 +30,8 @@ const getAllSchedules = catchAsync(
     ]);
 
     const result = await ScheduleService.getAllSchedulesFromDB(
-      queryObj,
-      paginationObj,
+      filterOptions,
+      paginationOptions,
       email,
     );
 
@@ -47,7 +47,7 @@ const getAllSchedules = catchAsync(
 const getSingleSchedule = catchAsync(
   async (req: Request, res: Response) => {
     const { id } = req.params;
-    const result = await ScheduleService.getSingleScheduleFromDB();
+    const result = await ScheduleService.getSingleScheduleFromDB(id);
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
@@ -59,7 +59,7 @@ const getSingleSchedule = catchAsync(
 
 const deleteSchedule = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await ScheduleService.deleteScheduleFromDB();
+  const result = await ScheduleService.deleteScheduleFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

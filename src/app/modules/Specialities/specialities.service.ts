@@ -1,6 +1,6 @@
 import { Specialities } from '@prisma/client';
 import { fileUploader } from '../../../helpers/fileUploader';
-import { IFile } from '../../interface/file';
+import { IFile } from '../../interface/file.interface';
 import prisma from '../../../shared/prisma';
 
 // CREATE SPECIALITIES

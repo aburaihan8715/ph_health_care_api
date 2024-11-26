@@ -1,4 +1,4 @@
-export interface IDoctorQueryObj {
+export interface IDoctorFilterOptions {
   searchTerm?: string;
   email?: string;
   contactNo?: string;

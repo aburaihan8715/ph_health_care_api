@@ -1,22 +1,22 @@
 import { Doctor, Prisma, UserStatus } from '@prisma/client';
 import { paginationHelper } from '../../../helpers/paginationHelper';
 import prisma from '../../../shared/prisma';
-import { IPagination } from '../../interface/pagination';
-import { IDoctorQueryObj, IDoctorUpdate } from './doctor.interface';
-import { doctorSearchableFields } from './doctor.constant';
+import { IDoctorFilterOptions, IDoctorUpdate } from './doctor.interface';
+import { IPaginationOptions } from '../../interface/pagination.interface';
+import { DOCTOR_SEARCHABLE_FIELDS } from './doctor.constant';
 
 // GET ALL DOCTORS
 const getAllDoctorsFromDB = async (
-  queryObj: IDoctorQueryObj,
-  paginationObj: IPagination,
+  filterOptions: IDoctorFilterOptions,
+  paginationOptions: IPaginationOptions,
 ) => {
-  const { searchTerm, specialities, ...filter } = queryObj;
+  const { searchTerm, specialities, ...filter } = filterOptions;
   const conditions: Prisma.DoctorWhereInput[] = [];
 
   // manage search
   if (searchTerm) {
     conditions.push({
-      OR: doctorSearchableFields.map((field) => ({
+      OR: DOCTOR_SEARCHABLE_FIELDS.map((field) => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -57,16 +57,21 @@ const getAllDoctorsFromDB = async (
   });
 
   // manage pagination
+  const whereConditions: Prisma.DoctorWhereInput =
+    conditions.length > 0 ? { AND: conditions } : {};
   const { limit, page, skip } =
-    paginationHelper.calculatePagination(paginationObj);
+    paginationHelper.calculatePagination(paginationOptions);
 
   const result = await prisma.doctor.findMany({
-    where: { AND: conditions },
+    where: whereConditions,
     skip,
     take: limit,
     orderBy:
-      paginationObj.sortBy && paginationObj.sortOrder
-        ? { [paginationObj.sortBy as string]: paginationObj.sortOrder }
+      paginationOptions.sortBy && paginationOptions.sortOrder
+        ? {
+            [paginationOptions.sortBy as string]:
+              paginationOptions.sortOrder,
+          }
         : { createdAt: 'desc' },
     include: {
       doctorSpecialities: {
@@ -79,7 +84,7 @@ const getAllDoctorsFromDB = async (
 
   // get document count
   const total = await prisma.doctor.count({
-    where: { AND: conditions },
+    where: whereConditions,
   });
 
   // finally return the result

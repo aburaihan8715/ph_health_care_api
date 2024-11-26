@@ -9,17 +9,17 @@ import {
 } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import prisma from '../../../shared/prisma';
-import { IFile } from '../../interface/file';
+import { IFile } from '../../interface/file.interface';
 import { fileUploader } from '../../../helpers/fileUploader';
 import {
   IAdminPayload,
   IDoctorPayload,
   IPatientPayload,
-  IUserQueryObj,
+  IUserFilterOptions,
 } from './user.interface';
 import { paginationHelper } from '../../../helpers/paginationHelper';
-import { userSearchAbleFields } from './user.constant';
-import { IPagination } from '../../interface/pagination';
+import { USER_SEARCHABLE_FIELDS } from './user.constant';
+import { IPaginationOptions } from '../../interface/pagination.interface';
 
 // CREATE ADMIN
 const createAdminIntoDB = async (
@@ -137,16 +137,19 @@ const createPatientIntoDB = async (
 
 // GET ALL USERS
 const getAllUsersFromDB = async (
-  queryObj: IUserQueryObj,
-  paginationObj: IPagination,
+  filterOptions: IUserFilterOptions,
+  paginationOptions: IPaginationOptions,
 ) => {
-  const { searchTerm, ...filter } = queryObj;
+  const { searchTerm, ...filter } = filterOptions;
+  const { limit, page, skip } =
+    paginationHelper.calculatePagination(paginationOptions);
+
   const conditions: Prisma.UserWhereInput[] = [];
 
   // manage search
   if (searchTerm) {
     conditions.push({
-      OR: userSearchAbleFields.map((field) => ({
+      OR: USER_SEARCHABLE_FIELDS.map((field) => ({
         [field]: {
           contains: searchTerm,
           mode: 'insensitive',
@@ -164,19 +167,20 @@ const getAllUsersFromDB = async (
     });
   }
 
-  // manage delete
-
   // manage pagination
-  const { limit, page, skip } =
-    paginationHelper.calculatePagination(paginationObj);
+  const whereConditions: Prisma.UserWhereInput =
+    conditions.length > 0 ? { AND: conditions } : {};
 
   const result = await prisma.user.findMany({
-    where: { AND: conditions },
+    where: whereConditions,
     skip,
     take: limit,
     orderBy:
-      paginationObj.sortBy && paginationObj.sortOrder
-        ? { [paginationObj.sortBy as string]: paginationObj.sortOrder }
+      paginationOptions.sortBy && paginationOptions.sortOrder
+        ? {
+            [paginationOptions.sortBy as string]:
+              paginationOptions.sortOrder,
+          }
         : { createdAt: 'desc' },
     select: {
       id: true,
@@ -194,7 +198,7 @@ const getAllUsersFromDB = async (
 
   // get document count
   const total = await prisma.user.count({
-    where: { AND: conditions },
+    where: whereConditions,
   });
 
   // finally return the result
