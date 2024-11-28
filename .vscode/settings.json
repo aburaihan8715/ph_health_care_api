@@ -47,6 +47,7 @@
     "INPROGRESS",
     "specialities",
     "speciality",
-    "tseslint"
+    "tseslint",
+    "uuidv"
   ]
 }
