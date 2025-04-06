@@ -11,7 +11,7 @@ import config from '../../../config';
 const loginUser: RequestHandler = catchAsync(async (req, res) => {
   const result = await AuthService.loginUser(req.body);
 
-  const { refreshToken } = result;
+  const { accessToken, refreshToken, needPasswordChange } = result;
 
   res.cookie('refreshToken', refreshToken, {
     secure: config.NODE_ENV === 'production',
@@ -23,8 +23,8 @@ const loginUser: RequestHandler = catchAsync(async (req, res) => {
     success: true,
     message: 'Logged in successfully!',
     data: {
-      accessToken: result.accessToken,
-      needPasswordChange: result.needPasswordChange,
+      accessToken,
+      needPasswordChange,
     },
   });
 });
@@ -33,17 +33,17 @@ const loginUser: RequestHandler = catchAsync(async (req, res) => {
 const refreshToken: RequestHandler = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  const result = await AuthService.refreshToken(refreshToken);
+  const { accessToken, needPasswordChange } =
+    await AuthService.refreshToken(refreshToken);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Access token generated successfully!',
-    data: result,
-    // data: {
-    //     accessToken: result.accessToken,
-    //     needPasswordChange: result.needPasswordChange
-    // }
+    data: {
+      accessToken,
+      needPasswordChange,
+    },
   });
 });
 
@@ -77,7 +77,13 @@ const forgotPassword = catchAsync(async (req: Request, res: Response) => {
 
 // RESET PASSWORD
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const token = req.headers.authorization || '';
+  let token = '';
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1];
+  }
 
   await AuthService.resetPassword(token, req.body);
 

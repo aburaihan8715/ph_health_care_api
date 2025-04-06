@@ -3,28 +3,54 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AdminService } from './admin.service';
 import httpStatus from 'http-status';
-import pick from '../../../shared/pick';
+// import pick from '../../../shared/pick';
 
 // GET ALL ADMINS
-const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
-  const query = req.query;
-  const filterOptions = pick(query, [
-    'name',
-    'email',
-    'contactNumber',
-    'searchTerm',
-  ]);
-  const paginationOptions = pick(query, [
-    'limit',
-    'page',
-    'sortBy',
-    'sortOrder',
-  ]);
+// const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
+//   const query = req.query;
+//   const filterOptions = pick(query, [
+//     'name',
+//     'email',
+//     'contactNumber',
+//     'searchTerm',
+//   ]);
+//   const paginationOptions = pick(query, [
+//     'limit',
+//     'page',
+//     'sortBy',
+//     'sortOrder',
+//   ]);
 
-  const result = await AdminService.getAllAdminsFromDB(
-    filterOptions,
-    paginationOptions,
-  );
+//   const result = await AdminService.getAllAdminsFromDB(
+//     filterOptions,
+//     paginationOptions,
+//   );
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'Admins fetched successfully!',
+//     meta: result.meta,
+//     data: result.data,
+//   });
+// });
+
+const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
+  // const query = req.query;
+  // const filterOptions = pick(query, [
+  //   'name',
+  //   'email',
+  //   'contactNumber',
+  //   'searchTerm',
+  // ]);
+  // const paginationOptions = pick(query, [
+  //   'limit',
+  //   'page',
+  //   'sortBy',
+  //   'sortOrder',
+  // ]);
+
+  const result = await AdminService.getAllAdminsFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -34,7 +60,6 @@ const getAllAdmins: RequestHandler = catchAsync(async (req, res) => {
     data: result.data,
   });
 });
-
 // GET SINGLE ADMIN
 const getSingleAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -51,7 +76,6 @@ const getSingleAdmin: RequestHandler = catchAsync(async (req, res) => {
 // UPDATE ADMIN
 const updateAdmin: RequestHandler = catchAsync(async (req, res) => {
   const { id } = req.params;
-
   const result = await AdminService.updateAdminIntoDB(id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,

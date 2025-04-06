@@ -15,25 +15,33 @@ const auth = (...roles: string[]) => {
     next: NextFunction,
   ) => {
     try {
-      const token = req.headers.authorization;
+      let token = '';
+      if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith('Bearer')
+      ) {
+        token = req.headers.authorization.split(' ')[1];
+      }
 
       if (!token) {
         throw new ApiError(
           httpStatus.UNAUTHORIZED,
-          'You are not authorized!',
+          'You are not logged in! Please log in to get access',
         );
       }
 
       const verifiedUser = jwtHelpers.verifyToken(
         token,
-        config.JWT.jwt_access_secret as Secret,
+        config.JWT_ACCESS_SECRET as Secret,
       );
 
-      req.user = verifiedUser;
-
       if (roles.length && !roles.includes(verifiedUser.role)) {
-        throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden!');
+        throw new ApiError(
+          httpStatus.FORBIDDEN,
+          'You have no permission to access this route!',
+        );
       }
+      req.user = verifiedUser;
       next();
     } catch (err) {
       next(err);

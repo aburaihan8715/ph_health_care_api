@@ -144,11 +144,11 @@ const getAllUsersFromDB = async (
   const { limit, page, skip } =
     paginationHelper.calculatePagination(paginationOptions);
 
-  const conditions: Prisma.UserWhereInput[] = [];
+  const andConditions: Prisma.UserWhereInput[] = [];
 
   // manage search
   if (searchTerm) {
-    conditions.push({
+    andConditions.push({
       OR: USER_SEARCHABLE_FIELDS.map((field) => ({
         [field]: {
           contains: searchTerm,
@@ -160,7 +160,7 @@ const getAllUsersFromDB = async (
 
   // manage filter
   if (Object.keys(filter).length > 0) {
-    conditions.push({
+    andConditions.push({
       AND: Object.entries(filter).map(([key, value]) => ({
         [key]: { equals: value },
       })),
@@ -169,7 +169,7 @@ const getAllUsersFromDB = async (
 
   // manage pagination
   const whereConditions: Prisma.UserWhereInput =
-    conditions.length > 0 ? { AND: conditions } : {};
+    andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.user.findMany({
     where: whereConditions,

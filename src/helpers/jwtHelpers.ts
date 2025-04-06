@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
+import jwt, { JwtPayload, Secret, SignOptions } from 'jsonwebtoken';
 
 const generateToken = (
   payload: any,
   secret: Secret,
-  expiresIn: string,
+  expireTime: SignOptions['expiresIn'] = '1h',
 ) => {
   const token = jwt.sign(payload, secret, {
     algorithm: 'HS256',
-    expiresIn,
+    expiresIn: expireTime,
   });
 
   return token;
